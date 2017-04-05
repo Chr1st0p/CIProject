@@ -6,29 +6,6 @@ from MyApp.src.utils.Paths import Paths
 from wordcloud import WordCloud
 
 
-def searchByKeyword(year, month, keyword):
-    news = []
-    processedsplit = keyword.split(" ")
-    likestr = ''
-    for w in processedsplit:
-        likestr += '%' + str(w).upper()
-    likestr += '%'
-    try:
-        cnn = mysql.connector.connect(**DbConfig.newsDataConfig)
-        cursor = cnn.cursor(buffered=True)
-        sql = 'Select title,link from newsdata.straitstimesdata where keyword like \'' + likestr + '\'' + " AND postyear= " + str(
-            year) + " and postmonth= " + str(month)
-        cursor.execute(sql)
-        row = cursor.fetchone()
-        while row is not None:
-            news.append({'title': row[0], 'link': row[1]})
-            row = cursor.fetchone()
-    except Error as e:
-        print BackColors.WARNING + "error" + BackColors.ENDC
-        print e
-    return news
-
-
 def SearchKeywordsByConfig(sqllist, maxwords):
     cachedstopwords = open(Paths.textPath + 'stopwords.txt').read()
     stopwords = cachedstopwords.split('\n')
@@ -46,7 +23,6 @@ def SearchKeywordsByConfig(sqllist, maxwords):
         finally:
             cursor.close()
             cnn.close()
-
     tokens = re.findall(r"[\w']+", "".join(''.join(elem) for elem in keyword[0]))
 
     lowerToken = [word.lower() for word in tokens]
@@ -54,7 +30,6 @@ def SearchKeywordsByConfig(sqllist, maxwords):
     filteredToken = [word for word in lowerToken if word not in stopwords]
     w = WordCloud().process_text(' '.join(filteredToken))
     w = sorted(w.items(), reverse=True, key=lambda x: x[1])
-
     if maxwords == '0':
         mx = 10
     elif maxwords == '1':
@@ -84,11 +59,20 @@ def SearchNewsByKeyword(sqlist):
                 if 'newsdata.straitstimesnewdata' in sql:
                     news.append({'title': row[0], 'link': row[1], 'postdate': row[2], 'source': 'StraitsTimes'})
                     row = cursor.fetchone()
-                if 'newsdata.todayonlinenewdata' in sql:
+                elif 'newsdata.todayonlinenewdata' in sql:
                     news.append({'title': row[0], 'link': row[1], 'postdate': row[2], 'source': 'TodayOnline'})
                     row = cursor.fetchone()
-                if 'newsdata.channelaisadata' in sql:
+                elif 'newsdata.channelaisadata' in sql:
                     news.append({'title': row[0], 'link': row[1], 'postdate': row[2], 'source': 'ChannelAsia'})
+                    row = cursor.fetchone()
+                elif 'socialmedia.allsingaporestuff' in sql:
+                    news.append({'title': row[0], 'link': row[1], 'postdate': row[2], 'source': 'All Singapore Stuff'})
+                    row = cursor.fetchone()
+                elif 'socialmedia.mothership' in sql:
+                    news.append({'title': row[0], 'link': row[1], 'postdate': row[2], 'source': 'MotherShip'})
+                    row = cursor.fetchone()
+                elif 'socialmedia.mustsharenews' in sql:
+                    news.append({'title': row[0], 'link': row[1], 'postdate': row[2], 'source': 'MustShareNews'})
                     row = cursor.fetchone()
         except Error as e:
             print sql

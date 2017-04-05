@@ -41,7 +41,7 @@ def MotherShipDateParse(datestring):
 
 def AllSingaporeStuffDateParse(datestring):
     try:
-        d = datetime.strptime(datestring[:len(datestring)-6], '%Y-%m-%dT%H:%M:%S').date()
+        d = datetime.strptime(datestring[:len(datestring) - 6], '%Y-%m-%dT%H:%M:%S').date()
     except:
         print "error"
         return datetime.date("1970-01-01")

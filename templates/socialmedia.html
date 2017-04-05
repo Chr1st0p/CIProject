@@ -1,10 +1,248 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'header.html' %}
+{% block content %}
+    <div class="row ">
+        <div class="col-md-5 col-sm-6 col-xs-12" style="vertical-align: middle;text-align: center ">
+            <form id="data" class="form-inline" action="" method="post">
+                Data Source:
+                <label><input name="news" type="checkbox" value="0"/>AllSingaporeStuff</label>
+                <label><input name="news" type="checkbox" value="1"/>MotherShip</label>
+                <label><input name="news" type="checkbox" value="2"/>MustShareNews</label>
+            </form>
+        </div>
+        <div id="durationselect" class="col-md-6 col-sm-6 col-xs-12" style="vertical-align: middle;text-align: center ">
+            Max Keywords:
+            <select id="maxwords">
+                <option value="0">10</option>
+                <option value="1">20</option>
+                <option value="2">50</option>
+                <option value="3">100</option>
+                <option value="4">200</option>
+                <option value="5">500</option>
+            </select>
+            Duration:
+            <select id="duration">
+                <option value="0">a week</option>
+                <option value="1">two weeks</option>
+                <option value="2">a month</option>
+                <option value="3">two months</option>
+                <option value="4">three months</option>
+                <option value="5">six months</option>
+                <option value="6">custom</option>
+            </select>
+            Start:<input id="start" type="date" required min="2016-09-01" value="2016-09-01">
+            End:<input id="end" type="date" required min="2016-09-01" value="2017-03-17">
+        </div>
+        <div id="generatediv" class="col-md-1 col-sm-6 col-xs-12" style="vertical-align: middle;text-align: center ">
+            <button id="generate" onclick="generate()" class="btn btn-default">Generate</button>
+        </div>
+    </div>
+    <div class="row">
+        <div id="socialmedia" class="center-block" style="height: 600px"></div>
+    </div>
+    <script type="text/javascript">
+        function generate() {
 
-</body>
-</html>
+            var selectRight = true;
+            var len = $("input:checkbox:checked").length;
+            if (len == 0) {
+                selectRight = false;
+                alert("No data selected, Please select the data source again!")
+            }
+
+            // request for the select data
+            var datasource = $("input[name='news']:checked").serialize();
+            var durationtype = $("#duration").find("option:selected").index();
+            var maxwords = $("#maxwords").find("option:selected").val();
+            var start = $("#start").val();
+            var end = $("#end").val();
+
+
+            if (durationtype == 6) {
+                if (DateDiff(start, end) > 0) {
+                    selectRight = false;
+                    alert("Wrong customize period")
+                }
+            }
+
+            if (selectRight) {
+                myChart.showLoading();
+                var postData = {
+                    "datasource": datasource,
+                    "durationtype": durationtype,
+                    "maxwords": maxwords,
+                    "start": start,
+                    "end": end,
+                };
+                var optiondata;
+                var wordfre = [];
+                $.ajax({
+                    url: "/socialdata/",
+                    type: "POST",
+                    data: postData,
+                    success: function (data) {
+                        optiondata = JSON.parse(data);
+                        if (optiondata["status"] == "Fail") {
+                            alert("Wrong configuration or No data in this period, Please select again")
+                        } else {
+
+                            {#                    alert(optiondata["result"]);#}
+                            wordfre.push({
+                                name: optiondata["result"][0][0],
+                                value: optiondata["result"][0][1],
+                                itemStyle: {
+                                    normal: {
+                                        color: 'black'
+                                    }
+                                }
+                            });
+                            for (var i = 1; i < optiondata["result"].length; i++) {
+                                wordfre.push({
+                                    name: optiondata["result"][i][0],
+                                    value: optiondata["result"][i][1],
+                                    itemStyle: createRandomItemStyle()
+                                })
+                            }
+
+                            myChart.hideLoading();
+                            myChart.setOption({
+                                title: {},
+                                tooltip: {
+                                    show: true
+                                },
+                                series: [{
+                                    type: 'wordCloud',
+                                    size: ['80%', '100%'],
+                                    textRotation: [0, 30, -30, 10, -10, 20, 40, 60, 75, 45, -20, -75, 90, -45],
+                                    textPadding: 0,
+                                    autoSize: {
+                                        enable: true,
+                                        minSize: 25
+                                    },
+                                    data: wordfre
+                                }]
+                            }, true);
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+    <script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
+    {#<script src="/static/js/echarts-2.2.7/build/dist/echarts-all.js"></script>#}
+    <script type="text/javascript">
+
+        // set max end date and start date
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd
+        }
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+
+        maxdate = yyyy + '-' + mm + '-' + dd;
+        document.getElementById("start").setAttribute("max", maxdate);
+        document.getElementById("end").setAttribute("max", maxdate);
+        document.getElementById("end").setAttribute("value", maxdate);
+
+        var myChart = echarts.init(document.getElementById('socialmedia'));
+
+        {#    var ecConfig = require('echarts/config');#}
+        // Add clickable
+        myChart.on(echarts.config.EVENT.CLICK, eConsole);
+
+        function DateDiff(startDate, endDate) {
+            var aDate, oDate1, oDate2, iDays;
+            aDate = startDate.split('-');
+            oDate1 = new Date(aDate[1] + '-' + aDate[2] + '-' + aDate[0]);
+            aDate = endDate.split('-');
+            oDate2 = new Date(aDate[1] + '-' + aDate[2] + '-' + aDate[0]);
+            iDays = parseInt((oDate1 - oDate2) / 1000 / 60 / 60 / 24);
+            return iDays;
+        }
+
+        function createRandomItemStyle() {
+            return {
+                normal: {
+                    color: 'rgb(' + [
+                        Math.round(Math.random() * 160),
+                        Math.round(Math.random() * 160),
+                        Math.round(Math.random() * 160)
+                    ].join(',') + ')'
+                }
+            };
+        }
+
+        myChart.showLoading();
+
+        // request for default data
+        var postData1 = {
+            "datasource": "news=0",
+            "durationtype": 2,
+            "maxwords": 3,
+            "start": "2016-09-01",
+            "end": "2017-03-01",
+        };
+        var optiondata1;
+        var wordfre1 = [];
+        $.ajax({
+            url: "/socialdata/",
+            type: "POST",
+            data: postData1,
+            success: function (data) {
+                optiondata1 = JSON.parse(data);
+                if (optiondata1["status"] == "Fail") {
+                    alert("Wrong configuration or No data in this period, Please select again")
+                } else {
+                    {#                    alert(optiondata["result"]);#}
+                    wordfre1.push({
+                        name: optiondata1["result"][0][0],
+                        value: optiondata1["result"][0][1],
+                        itemStyle: {
+                            normal: {
+                                color: 'black'
+                            }
+                        }
+                    });
+                    for (var i = 1; i < optiondata1["result"].length; i++) {
+                        wordfre1.push({
+                            name: optiondata1["result"][i][0],
+                            value: optiondata1["result"][i][1],
+                            itemStyle: createRandomItemStyle()
+                        })
+                    }
+                    myChart.hideLoading();
+                    myChart.setOption({
+                        title: {},
+                        tooltip: {
+                            show: true
+                        },
+                        series: [{
+                            type: 'wordCloud',
+                            size: ['80%', '100%'],
+                            textRotation: [0, 30, -30, 10, -10, 20, 40, 60, 75, 45, -20, -75, 90, -45],
+                            textPadding: 0,
+                            autoSize: {
+                                enable: true,
+                                minSize: 25
+                            },
+                            data: wordfre1
+                        }]
+                    }, true);
+                }
+            }
+        });
+        // handle Click
+        function eConsole(param) {
+            if (typeof param.seriesIndex == 'undefined') {
+                return;
+            }
+            if (param.type == 'click') {
+                window.open("/socialdetail?keyword=" + param.name, "newswindow", "height=600, width=400, toolbar=no, menubar=no, scrollbars=yes, resizable=no, location=no, status=no");
+            }
+        }
+    </script>
+{% endblock %}

@@ -716,3 +716,8 @@ live
 blog
 straits
 times
+singapores
+singaporean
+Singaporean
+Singapores
+Singapore

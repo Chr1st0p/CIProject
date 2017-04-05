@@ -8,8 +8,8 @@
 <ul>
     {% for news in newslist %}
         <li>
-            <a href="{{ news.link }}" target="_blank">{{ news.title }}</a>
-        </li>,{{ news.postdate }},{{ news.source }}
+            <a href="{{ news.link }}" target="_blank">{{ news.title }}</a>,{{ news.source }},{{ news.postdate }}
+        </li>
     {% endfor %}
 </ul>
 </body>
