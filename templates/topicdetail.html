@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>News contains the keyword</title>
+</head>
+<body>
+<ul>
+    {% for news in newslist %}
+        <li>
+            <a href="{{ news.link }}" target="_blank">{{ news.title }}</a>
+        </li>,{{ news.postdate }},{{ news.source }}
+    {% endfor %}
+</ul>
+</body>
+</html>

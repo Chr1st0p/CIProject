@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {#    <link rel="stylesheet" href="/static/css/bootstrap.min.css">#}
+    <script src="https://code.jquery.com/jquery-3.2.0.min.js"></script>
+    {#    <script type="text/javascript" src="/static/js/jquery/jquery-3.2.0.min.js"></script>#}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    {#    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>#}
+</head>
+<body>
+<nav class="navbar center-nav navbar-inverse navbar-static-top" role="navigation">
+    <div class="container">
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Home</a></li>
+            <li><a href="mainstream">Main Stream News</a></li>
+            <li><a href="#">Social Media</a></li>
+            <li><a href="#">Compare</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="row">
+    <div id="main" class="center-block" style="height: 600px"></div>
+</div>
+<script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
+{#<script src="/static/js/echarts-2.2.7/build/dist/echarts-all.js"></script>#}
+<script type="text/javascript">
+    var myChart = echarts.init(document.getElementById('main'));
+    // 添加点击事件
+    {#    var ecConfig = require('echarts/config');#}
+    myChart.on(echarts.config.EVENT.CLICK, eConsole);
+
+    function createRandomItemStyle() {
+        return {
+            normal: {
+                color: 'rgb(' + [
+                    Math.round(Math.random() * 160),
+                    Math.round(Math.random() * 160),
+                    Math.round(Math.random() * 160)
+                ].join(',') + ')'
+            }
+        };
+    }
+
+    option = {
+        title: {},
+        tooltip: {
+            show: true
+        },
+        series: [{
+            type: 'wordCloud',
+            size: ['80%', '80%'],
+            textRotation: [0, 45, 90, -45],
+            textPadding: 0,
+            autoSize: {
+                enable: true,
+                minSize: 20
+            },
+            data: []
+        }]
+    };
+    myChart.showLoading();
+
+    // 为echarts对象加载数据
+
+
+    function eConsole(param) {
+        if (typeof param.seriesIndex == 'undefined') {
+            return;
+        }
+        if (param.type == 'click') {
+            window.open("/homedetail?keyword=" + param.name, "newwindow", "height=600, width=400, toolbar=no, menubar=no, scrollbars=yes, resizable=no, location=no, status=no");
+        }
+    }
+    var datasource = "news=1"
+    var durationtype = 2;
+    var start = "2016-09-01"
+    var end = new Date().toLocaleDateString();
+    var postData = {
+        "datasource": datasource,
+        "durationtype": durationtype,
+        "start": start,
+        "end": end,
+    };
+    var optiondata;
+    var wordfre = [];
+    $.ajax({
+        url: "/home/",
+        type: "POST",
+        data: postData,
+        success: function (data) {
+            optiondata = JSON.parse(data);
+            if (optiondata["status"] == "Fail") {
+                alert("Wrong configuration or No data in this period, Please select again")
+            } else {
+                wordfre.push({
+                    name: optiondata["result"][0][0],
+                    value: optiondata["result"][0][1],
+                    itemStyle: {
+                        normal: {
+                            color: 'black'
+                        }
+                    }
+                });
+                for (var i = 1; i < optiondata["result"].length; i++) {
+                    wordfre.push({
+                        name: optiondata["result"][i][0],
+                        value: optiondata["result"][i][1],
+                        itemStyle: createRandomItemStyle()
+                    })
+                }
+                myChart.hideLoading();
+                myChart.setOption({
+                    title: {},
+                    tooltip: {
+                        show: true
+                    },
+                    series: [{
+                        type: 'wordCloud',
+                        size: ['80%', '80%'],
+                        textRotation: [0, 30, -30, 10, -10, 20, 40, 60, 75, 45, -20, -75, 90, -45],
+                        textPadding: 0,
+                        autoSize: {
+                            enable: true,
+                            minSize: 20
+                        },
+                        data: wordfre
+                    }]
+                },true);
+            }
+        }
+    });
+</script>
+
+<footer class="footer footer-nav navbar-inverse navbar-fixed-bottom" style="height:50px ">
+    <div class="row">
+        <div class="center-block" style="width: 200px">
+            这是 center-block 实例
+        </div>
+    </div>
+</footer>
+</body>
+</html>
