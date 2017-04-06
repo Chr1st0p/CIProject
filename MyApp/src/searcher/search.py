@@ -23,12 +23,12 @@ def SearchKeywordsByConfig(sqllist, maxwords):
         finally:
             cursor.close()
             cnn.close()
-    tokens = re.findall(r"[\w']+", "".join(''.join(elem) for elem in keyword[0]))
+    tokens = re.findall(r"[\w']+", " ".join(' '.join(elem) for elem in keyword[0]))
 
     lowerToken = [word.lower() for word in tokens]
 
     filteredToken = [word for word in lowerToken if word not in stopwords]
-    w = WordCloud().process_text(' '.join(filteredToken))
+    w = WordCloud().process_text(" ".join(filteredToken))
     w = sorted(w.items(), reverse=True, key=lambda x: x[1])
     if maxwords == '0':
         mx = 10

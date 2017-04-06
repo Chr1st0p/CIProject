@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import csrf_exempt
 
-from MyApp.src.parsers.ParseConfig import MainStreamGet, SocialMediaGet
+from MyApp.src.parsers.ParseConfig import MainStreamGet, SocialMediaGet, SearchMainKeyword, SearchSocialKeyword
 from MyApp.src.searcher.search import SearchNewsByKeyword
 
 
@@ -23,6 +23,10 @@ def socialmedia(request):
 
 def compare(request):
     return render_to_response('compare.html')
+
+
+def contactus(request):
+    return render_to_response('contact.html')
 
 
 @csrf_exempt
@@ -53,66 +57,6 @@ def mainstreamprocess(request):
 
 
 @csrf_exempt
-def maincompareprocess(request):
-    if request.method == "POST":
-        status = 'OK'
-        if request.POST.get('durationtype') == '6':
-            start = datetime.strptime(request.POST.get('start'), "%Y-%m-%d")
-            end = datetime.strptime(request.POST.get('end'), "%Y-%m-%d")
-
-            if (end - start).days < 0:
-                status = 'Fail'
-        datas = MainStreamGet(request.POST.get('datasource'), request.POST.get('durationtype'),
-                              request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
-        if len(datas) == 0:
-            status = "Fail"
-
-        if status != "Fail":
-            request.session["maindcompareatas"] = request.POST.get('datasource')
-            request.session["maincomparedurationtype"] = request.POST.get('durationtype')
-            request.session["maincomparestart"] = request.POST.get('start')
-            request.session["maincompareend"] = request.POST.get('end')
-        return HttpResponse(json.dumps({
-            "status": status,
-            "length": len(datas),
-            "result": datas
-        }))
-
-
-@csrf_exempt
-def socialmediacompareprocess(request):
-    if request.method == "POST":
-        # print request.POST.get('datasource')
-        # # print request.POST.get('durationtype')
-        # # print request.POST.get('maxwords')
-        # print request.POST.get('start')
-        # print request.POST.get('end')
-        status = 'OK'
-        if request.POST.get('durationtype') == '6':
-            start = datetime.strptime(request.POST.get('start'), "%Y-%m-%d")
-            end = datetime.strptime(request.POST.get('end'), "%Y-%m-%d")
-            if (end - start).days < 0:
-                status = 'Fail'
-
-        data = SocialMediaGet(request.POST.get('datasource'), request.POST.get('durationtype'),
-                              request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
-        if len(data) == 0:
-            status = "Fail"
-
-        if status != "Fail":
-            request.session["socialcomparedatas"] = request.POST.get('datasource')
-            request.session["socialcomparedurationtype"] = request.POST.get('durationtype')
-            request.session["socialcomparestart"] = request.POST.get('start')
-            request.session["socialcompareend"] = request.POST.get('end')
-
-        return HttpResponse(json.dumps({
-            "status": status,
-            "length": len(data),
-            "result": data
-        }))
-
-
-@csrf_exempt
 def mainsocialcompareprocess(request):
     if request.method == "POST":
         # print request.POST.get('datasource')
@@ -138,15 +82,11 @@ def mainsocialcompareprocess(request):
             status = "Fail"
 
         if status != "Fail":
-            request.session["socialcomparedatas"] = request.POST.get('datasource')
-            request.session["socialcomparedurationtype"] = request.POST.get('durationtype')
-            request.session["socialcomparestart"] = request.POST.get('start')
-            request.session["socialcompareend"] = request.POST.get('end')
-            request.session["maindcompareatas"] = request.POST.get('datasource')
-            request.session["maincomparedurationtype"] = request.POST.get('durationtype')
-            request.session["maincomparestart"] = request.POST.get('start')
-            request.session["maincompareend"] = request.POST.get('end')
-
+            request.session["socialcomparedatas"] = request.POST.get('datasource2')
+            request.session["comparedurationtype"] = request.POST.get('durationtype')
+            request.session["comparestart"] = request.POST.get('start')
+            request.session["compareend"] = request.POST.get('end')
+            request.session["maindcompareatas"] = request.POST.get('datasource2')
         return HttpResponse(json.dumps({
             "status": status,
             "length": len(data1) + len(data2),
@@ -199,45 +139,19 @@ def mainstreamdetail(request):
     # print end
 
     keyword = request.GET.get('keyword')
-    if str(source) == "":
-        print "a"
-        source = "news=0"
-        duration = "2"
-    processedsplit = keyword.split(" ")
-    likestr = ''
-    for w in processedsplit:
-        likestr += '%' + str(w).upper()
-    likestr += '%'
-    # source = source.split(',')
 
-    if duration == '6':
-        sqlend = ' \'' + start + '\' and postdate< \'' + end + '\';'
-    elif duration == '0':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 1 WEEK)'
-    elif duration == '1':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 2 WEEK)'
-    elif duration == '2':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 1 MONTH)'
-    elif duration == '3':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 2 MONTH)'
-    elif duration == '4':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 3 MONTH)'
-    elif duration == '5':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 6 MONTH)'
-    else:
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 1 MONTH)'
-    sqllist = []
+    newslist = SearchMainKeyword(source, duration, start, end, keyword)
+    return render_to_response('topicdetail.html', {'newslist': newslist})
 
-    if '0' in source:
-        sqllist.append(
-            'select title,link,postdate from newsdata.straitstimesnewdata where keyword like \'' + likestr + '\' and postdate>' + sqlend)
-    if '1' in source:
-        sqllist.append(
-            'select title,link,postdate from newsdata.todayonlinenewdata where keyword like \'' + likestr + '\' and postdate>' + sqlend)
-    if '2' in source:
-        sqllist.append(
-            'select title,link,postdate from newsdata.channelaisadata where keyword like \'' + likestr + '\' and postdate>' + sqlend)
-    newslist = SearchNewsByKeyword(sqllist)
+
+def comparemainstreamdetail(request):
+    source = request.session.get("maindcompareatas", default=None)
+    duration = request.session.get("comparedurationtype", default=None)
+    start = request.session.get("comparestart", default=None)
+    end = request.session.get("compareend", default=None)
+    keyword = request.GET.get('keyword')
+
+    newslist = SearchMainKeyword(source, duration, start, end, keyword)
     return render_to_response('topicdetail.html', {'newslist': newslist})
 
 
@@ -246,49 +160,17 @@ def socialmediadetail(request):
     duration = request.session.get("socialdurationtype", default=None)
     start = request.session.get("socialstart", default=None)
     end = request.session.get("socialend", default=None)
-    # print source
-    # print duration
-    # print start
-    # print end
-
     keyword = request.GET.get('keyword')
-    if str(source) == "":
-        print "a"
-        source = "news=0"
-        duration = "2"
-    processedsplit = keyword.split(" ")
-    likestr = ''
-    for w in processedsplit:
-        likestr += '%' + str(w).upper()
-    likestr += '%'
-    # source = source.split(',')
 
-    if duration == '6':
-        sqlend = ' \'' + start + '\' and postdate< \'' + end + '\';'
-    elif duration == '0':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 1 WEEK)'
-    elif duration == '1':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 2 WEEK)'
-    elif duration == '2':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 1 MONTH)'
-    elif duration == '3':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 2 MONTH)'
-    elif duration == '4':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 3 MONTH)'
-    elif duration == '5':
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 6 MONTH)'
-    else:
-        sqlend = ' DATE_SUB(CURDATE(), INTERVAL 1 MONTH)'
-    sqllist = []
+    newslist = SearchSocialKeyword(source, duration, start, end, keyword)
+    return render_to_response('topicdetail.html', {'newslist': newslist})
 
-    if '0' in source:
-        sqllist.append(
-            'select title,link,postdate from socialmedia.allsingaporestuff where keyword like \'' + likestr + '\' and postdate>' + sqlend)
-    if '1' in source:
-        sqllist.append(
-            'select title,link,postdate from socialmedia.mothership where keyword like \'' + likestr + '\' and postdate>' + sqlend)
-    if '2' in source:
-        sqllist.append(
-            'select title,link,postdate from socialmedia.mustsharenews where keyword like \'' + likestr + '\' and postdate>' + sqlend)
-    newslist = SearchNewsByKeyword(sqllist)
+
+def comparesocialmediadetail(request):
+    source = request.session.get("socialcomparedatas", default=None)
+    duration = request.session.get("comparedurationtype", default=None)
+    start = request.session.get("comparestart", default=None)
+    end = request.session.get("compareend", default=None)
+    keyword = request.GET.get('keyword')
+    newslist = SearchSocialKeyword(source, duration, start, end, keyword)
     return render_to_response('topicdetail.html', {'newslist': newslist})

@@ -721,3 +721,6 @@ singaporean
 Singaporean
 Singapores
 Singapore
+facebook
+twitter
+google

@@ -1,44 +1,64 @@
 {% extends 'header.html' %}
 {% block content %}
-    <div class="row ">
-        <div class="col-md-5 col-sm-6 col-xs-12" style="vertical-align: middle;text-align: center ">
-            <form id="data" class="form-inline" action="" method="post">
-                Data Source:
-                <label><input name="news" type="checkbox" value="0"/>AllSingaporeStuff</label>
-                <label><input name="news" type="checkbox" value="1"/>MotherShip</label>
-                <label><input name="news" type="checkbox" value="2"/>MustShareNews</label>
-            </form>
+    <div class="container col-md-12 col-sm-12 col-xs-12">
+        <div class="row ">
+            <div class="col-md-4 col-sm-6 col-xs-12" style="text-align:center;vertical-align:middle">
+                <div style="margin:0 auto">
+                    <form id="data" class="form-inline" action="" method="post">
+                        Data Source:
+                        <label><input name="news" type="checkbox" value="0"/>
+                            <small>AllSingaporeStuff</small>
+                        </label>
+                        <label><input name="news" type="checkbox" value="1"/>
+                            <small>MotherShip</small>
+                        </label>
+                        <label><input name="news" type="checkbox" value="2"/>
+                            <small>MustShareNews</small>
+                        </label>
+                    </form>
+                </div>
+            </div>
+            <div id="durationselect" class="col-md-7 col-sm-6 col-xs-12"
+                 style="text-align:center;vertical-align:middle">
+                <div style="margin:0 auto">
+                    Max Keywords:
+                    <select id="maxwords">
+                        <option value="0">10</option>
+                        <option value="1">20</option>
+                        <option value="2">50</option>
+                        <option value="3">100</option>
+                        <option value="4">200</option>
+                        <option value="5">500</option>
+                    </select>
+                    Duration:
+                    <select id="duration">
+                        <option value="0">a week</option>
+                        <option value="1">two weeks</option>
+                        <option value="2">a month</option>
+                        <option value="3">two months</option>
+                        <option value="4">three months</option>
+                        <option value="5">six months</option>
+                        <option value="6">custom</option>
+                    </select>
+                    Start:<input id="start" type="date" required min="2016-09-01" value="2016-09-01">
+                    End:<input id="end" type="date" required min="2016-09-01" value="2017-03-17">
+                </div>
+            </div>
+            <div id="generatediv" class="col-md-1 col-sm-6 col-xs-12" style="text-align:center;vertical-align:middle">
+                <div style="margin:0 auto">
+                    <button id="generate" onclick="generate()" class="btn btn-default">Generate</button>
+                </div>
+            </div>
+            <div class="col-md-1 col-sm-6 col-xs-12"
+                 style="vertical-align: middle;text-align: center ">
+
+            </div>
         </div>
-        <div id="durationselect" class="col-md-6 col-sm-6 col-xs-12" style="vertical-align: middle;text-align: center ">
-            Max Keywords:
-            <select id="maxwords">
-                <option value="0">10</option>
-                <option value="1">20</option>
-                <option value="2">50</option>
-                <option value="3">100</option>
-                <option value="4">200</option>
-                <option value="5">500</option>
-            </select>
-            Duration:
-            <select id="duration">
-                <option value="0">a week</option>
-                <option value="1">two weeks</option>
-                <option value="2">a month</option>
-                <option value="3">two months</option>
-                <option value="4">three months</option>
-                <option value="5">six months</option>
-                <option value="6">custom</option>
-            </select>
-            Start:<input id="start" type="date" required min="2016-09-01" value="2016-09-01">
-            End:<input id="end" type="date" required min="2016-09-01" value="2017-03-17">
-        </div>
-        <div id="generatediv" class="col-md-1 col-sm-6 col-xs-12" style="vertical-align: middle;text-align: center ">
-            <button id="generate" onclick="generate()" class="btn btn-default">Generate</button>
+        <div class="row">
+            <div id="socialmedia" class="center-block col-md-12 col-sm-12 col-xs-12" style="height: 600px"></div>
         </div>
     </div>
-    <div class="row">
-        <div id="socialmedia" class="center-block" style="height: 600px"></div>
-    </div>
+
     <script type="text/javascript">
         function generate() {
 
