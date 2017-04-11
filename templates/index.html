@@ -2,12 +2,10 @@
 {% block content %}
     <div class="container">
 
-        <!-- Portfolio Item Heading -->
         <h1 class="my-4">News in Singapore
             <small>Demo</small>
         </h1>
 
-        <!-- Portfolio Item Row -->
         <div class="row">
 
             <div class="col-md-8" id="main" style="height: 500px;">
@@ -56,14 +54,13 @@
             </div>
 
         </div>
-        <!-- /.row -->
 
     </div>
     <script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
-    <script src="/static/js/echarts-2.2.7/build/dist/echarts-all.js"></script>
     <script type="text/javascript">
+
         var myChart = echarts.init(document.getElementById('main'));
-        // 添加点击事件
+
         myChart.on(echarts.config.EVENT.CLICK, eConsole);
 
         function createRandomItemStyle() {
@@ -97,9 +94,6 @@
         };
         myChart.showLoading();
 
-        // 为echarts对象加载数据
-
-
         function eConsole(param) {
             if (typeof param.seriesIndex == 'undefined') {
                 return;
@@ -127,7 +121,9 @@
             success: function (data) {
                 optiondata = JSON.parse(data);
                 if (optiondata["status"] == "Fail") {
-                    alert("Wrong configuration or No data in this period, Please select again")
+                    alert("Wrong configuration or No data in this period, Please select again");
+                } else if (optiondata["status"] == "NoData") {
+                    alert("No data in this period, Please select again");
                 } else {
                     wordfre.push({
                         name: optiondata["result"][0][0],

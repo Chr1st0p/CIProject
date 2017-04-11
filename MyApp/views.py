@@ -42,7 +42,7 @@ def mainstreamprocess(request):
         datas = MainStreamGet(request.POST.get('datasource'), request.POST.get('durationtype'),
                               request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
         if len(datas) == 0:
-            status = "Fail"
+            status = "NoData"
 
         if status != "Fail":
             request.session["maindatas"] = request.POST.get('datasource')
@@ -77,9 +77,9 @@ def mainsocialcompareprocess(request):
                               request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
 
         if len(data1) == 0:
-            status = "Fail"
+            status = "NoData"
         if len(data2) == 0:
-            status = "Fail"
+            status = "NoData"
 
         if status != "Fail":
             request.session["socialcomparedatas"] = request.POST.get('datasource2')
@@ -113,7 +113,7 @@ def socialmediaprocess(request):
         data = SocialMediaGet(request.POST.get('datasource'), request.POST.get('durationtype'),
                               request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
         if len(data) == 0:
-            status = "Fail"
+            status = "NoData"
 
         if status != "Fail":
             request.session["socialdatas"] = request.POST.get('datasource')

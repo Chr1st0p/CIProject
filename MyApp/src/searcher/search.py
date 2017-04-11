@@ -27,7 +27,7 @@ def SearchKeywordsByConfig(sqllist, maxwords):
 
     lowerToken = [word.lower() for word in tokens]
 
-    filteredToken = [word for word in lowerToken if word not in stopwords]
+    filteredToken = [word for word in lowerToken if word.strip() not in stopwords]
     w = WordCloud().process_text(" ".join(filteredToken))
     w = sorted(w.items(), reverse=True, key=lambda x: x[1])
     if maxwords == '0':

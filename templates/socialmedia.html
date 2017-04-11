@@ -102,7 +102,9 @@
                     success: function (data) {
                         optiondata = JSON.parse(data);
                         if (optiondata["status"] == "Fail") {
-                            alert("Wrong configuration or No data in this period, Please select again")
+                            alert("Wrong configuration or No data in this period, Please select again");
+                        } else if (optiondata["status"] == "NoData") {
+                            alert("No data in this period, Please select again");
                         } else {
 
                             {#                    alert(optiondata["result"]);#}
@@ -148,7 +150,6 @@
         }
     </script>
     <script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
-    {#<script src="/static/js/echarts-2.2.7/build/dist/echarts-all.js"></script>#}
     <script type="text/javascript">
 
         // set max end date and start date
@@ -215,7 +216,9 @@
             success: function (data) {
                 optiondata1 = JSON.parse(data);
                 if (optiondata1["status"] == "Fail") {
-                    alert("Wrong configuration or No data in this period, Please select again")
+                    alert("Wrong configuration or No data in this period, Please select again");
+                } else if (optiondata1["status"] == "NoData") {
+                    alert("No data in this period, Please select again");
                 } else {
                     {#                    alert(optiondata["result"]);#}
                     wordfre1.push({
