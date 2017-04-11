@@ -14,16 +14,14 @@
 
             <div class="col-md-4">
                 <h3 class="my-3">Project Description</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam viverra euismod odio, gravida
-                    pellentesque
-                    urna varius vitae. Sed dui lorem, adipiscing in adipiscing et, interdum nec metus. Mauris ultricies,
-                    justo eu convallis placerat, felis enim.</p>
+                <p> In this project, a web-based system would be designed and developed to identify Singapore related
+                    news from both mainstream and social media sources, group the news by topics and present the topics
+                    by proper text visualization methods. </p>
                 <h3 class="my-3">Project Details</h3>
                 <ul>
-                    <li>Lorem Ipsum</li>
-                    <li>Dolor Sit Amet</li>
-                    <li>Consectetur</li>
-                    <li>Adipiscing Elit</li>
+                    <li>MainStream</li>
+                    <li>SocialMedia</li>
+                    <li>Compare</li>
                 </ul>
             </div>
 
@@ -37,19 +35,22 @@
 
             <div class="col-md-4 col-sm-6 mb-4">
                 <a href="/mainstream">
-                    <img class="img-fluid" src="http://placehold.it/500x300" alt="">
+                    <img class="img-fluid"
+                         src="https://github.com/Chr1st0p/CIProject/raw/master/static/images/image1.png" alt="">
                 </a>
             </div>
 
             <div class="col-md-4 col-sm-6 mb-4">
                 <a href="/socialmedia">
-                    <img class="img-fluid" src="http://placehold.it/500x300" alt="">
+                    <img class="img-fluid"
+                         src="https://github.com/Chr1st0p/CIProject/raw/master/static/images/image2.png" alt="">
                 </a>
             </div>
 
             <div class="col-md-4 col-sm-6 mb-4">
                 <a href="/compare">
-                    <img class="img-fluid" src="http://placehold.it/500x300" alt="">
+                    <img class="img-fluid"
+                         src="https://github.com/Chr1st0p/CIProject/raw/master/static/images/image3.png" alt="">
                 </a>
             </div>
 
@@ -161,6 +162,14 @@
                     }, true);
                 }
             }
+        });
+    </script>
+    <script>
+        $(function () {
+            $(".nav-item a").on("click", function () {
+                $(".nav-item").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
         });
     </script>
 {% endblock %}
