@@ -1,5 +1,6 @@
 import re
 from MyApp.src.searcher.search import SearchKeywordsByConfig, SearchNewsByKeyword
+from datetime import datetime
 
 
 def MainStreamByCustom(source, maxwords, start, end):
@@ -48,7 +49,7 @@ def MainStreamByDuration(source, duration, maxwords):
     return SearchKeywordsByConfig(sqllist, maxwords)
 
 
-def MainStreamGet(source, duration, maxwords, start, end):
+def GetMainStreamNews(source, duration, maxwords, start, end):
     lis = re.findall(r'[0-9]', str(source))
     sqllist = []
     if duration == '6':
@@ -78,7 +79,7 @@ def MainStreamGet(source, duration, maxwords, start, end):
     return SearchKeywordsByConfig(sqllist, maxwords)
 
 
-def SocialMediaGet(source, duration, maxwords, start, end):
+def GetSocialMediaNews(source, duration, maxwords, start, end):
     sqllist = []
     lis = re.findall(r'[0-9]', str(source))
     if duration == '6':
@@ -108,7 +109,7 @@ def SocialMediaGet(source, duration, maxwords, start, end):
     return SearchKeywordsByConfig(sqllist, maxwords)
 
 
-def SearchMainKeyword(source, duration, start, end, keyword):
+def SearchMainByKeyword(source, duration, start, end, keyword):
     if str(source) == "":
         print "a"
         source = "news=0"
@@ -149,7 +150,7 @@ def SearchMainKeyword(source, duration, start, end, keyword):
     return SearchNewsByKeyword(sqllist)
 
 
-def SearchSocialKeyword(source, duration, start, end, keyword):
+def SearchSocialByKeyword(source, duration, start, end, keyword):
     if str(source) == "":
         source = "news=0"
         duration = "2"
@@ -158,7 +159,6 @@ def SearchSocialKeyword(source, duration, start, end, keyword):
     for w in processedsplit:
         likestr += '%' + str(w).upper()
     likestr += '%'
-
     if duration == '6':
         sqlend = ' \'' + start + '\' and postdate< \'' + end + '\';'
     elif duration == '0':
@@ -188,3 +188,12 @@ def SearchSocialKeyword(source, duration, start, end, keyword):
             'select title,link,postdate from socialmedia.mustsharenews where UPPER(keyword) like \'' + likestr + '\' and postdate>' + sqlend)
 
     return SearchNewsByKeyword(sqllist)
+
+
+# Avoid SQL injection
+def IsValidDate(datestring):
+    try:
+        datetime.strptime(datestring, "%Y-%m-%d")
+        return True
+    except:
+        return False

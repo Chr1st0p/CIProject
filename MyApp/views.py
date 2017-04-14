@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import csrf_exempt
 
-from MyApp.src.parsers.ParseConfig import MainStreamGet, SocialMediaGet, SearchMainKeyword, SearchSocialKeyword
+from MyApp.src.parsers.ParseConfig import GetMainStreamNews, GetSocialMediaNews, SearchMainByKeyword, SearchSocialByKeyword
 from MyApp.src.searcher.search import SearchNewsByKeyword
 
 
@@ -39,8 +39,8 @@ def mainstreamprocess(request):
 
             if (end - start).days < 0:
                 status = 'Fail'
-        datas = MainStreamGet(request.POST.get('datasource'), request.POST.get('durationtype'),
-                              request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
+        datas = GetMainStreamNews(request.POST.get('datasource'), request.POST.get('durationtype'),
+                                  request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
         if len(datas) == 0:
             status = "NoData"
 
@@ -71,10 +71,10 @@ def mainsocialcompareprocess(request):
             if (end - start).days < 0:
                 status = 'Fail'
 
-        data2 = SocialMediaGet(request.POST.get('datasource1'), request.POST.get('durationtype'),
-                               request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
-        data1 = MainStreamGet(request.POST.get('datasource2'), request.POST.get('durationtype'),
-                              request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
+        data2 = GetSocialMediaNews(request.POST.get('datasource1'), request.POST.get('durationtype'),
+                                   request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
+        data1 = GetMainStreamNews(request.POST.get('datasource2'), request.POST.get('durationtype'),
+                                  request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
 
         if len(data1) == 0:
             status = "NoData"
@@ -110,8 +110,8 @@ def socialmediaprocess(request):
             if (end - start).days < 0:
                 status = 'Fail'
 
-        data = SocialMediaGet(request.POST.get('datasource'), request.POST.get('durationtype'),
-                              request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
+        data = GetSocialMediaNews(request.POST.get('datasource'), request.POST.get('durationtype'),
+                                  request.POST.get('maxwords'), request.POST.get('start'), request.POST.get('end'))
         if len(data) == 0:
             status = "NoData"
 
@@ -140,7 +140,7 @@ def mainstreamdetail(request):
 
     keyword = request.GET.get('keyword')
 
-    newslist = SearchMainKeyword(source, duration, start, end, keyword)
+    newslist = SearchMainByKeyword(source, duration, start, end, keyword)
     return render_to_response('topicdetail.html', {'newslist': newslist})
 
 
@@ -151,7 +151,7 @@ def comparemainstreamdetail(request):
     end = request.session.get("compareend", default=None)
     keyword = request.GET.get('keyword')
 
-    newslist = SearchMainKeyword(source, duration, start, end, keyword)
+    newslist = SearchMainByKeyword(source, duration, start, end, keyword)
     return render_to_response('topicdetail.html', {'newslist': newslist})
 
 
@@ -162,7 +162,7 @@ def socialmediadetail(request):
     end = request.session.get("socialend", default=None)
     keyword = request.GET.get('keyword')
 
-    newslist = SearchSocialKeyword(source, duration, start, end, keyword)
+    newslist = SearchSocialByKeyword(source, duration, start, end, keyword)
     return render_to_response('topicdetail.html', {'newslist': newslist})
 
 
@@ -172,5 +172,5 @@ def comparesocialmediadetail(request):
     start = request.session.get("comparestart", default=None)
     end = request.session.get("compareend", default=None)
     keyword = request.GET.get('keyword')
-    newslist = SearchSocialKeyword(source, duration, start, end, keyword)
+    newslist = SearchSocialByKeyword(source, duration, start, end, keyword)
     return render_to_response('topicdetail.html', {'newslist': newslist})
