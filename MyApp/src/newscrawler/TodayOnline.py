@@ -66,7 +66,7 @@ def parseHtml(iters, match, i):
     if matchlink:
         contentHtml = requests.get(url=link, headers=RequestHeader.browserHeader)
         contentSoup = BeautifulSoup(contentHtml.text, 'lxml')
-        content = contentSoup.find_all(attrs={'property': 'og:description'})[0]['content'].encode('utf-8') \
+        content = contentSoup.find_all(attrs={'property': 'og:description'})[0]['content'] \
             .replace('\n', '').replace('SINGAPORE', '')
 
         title = contentSoup.find_all(attrs={'property': 'twitter:title'})[0]['content']
